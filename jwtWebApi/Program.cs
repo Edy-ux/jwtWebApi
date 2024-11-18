@@ -31,13 +31,6 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddAuthentication().AddJwtBearer();
 
-string[] words = ["Apple", "Banana", "Cherry "];
-string resul =
-    words[1].Substring(0, 3) +
-    words[2][2];
-    
-Console.WriteLine(resul);
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
