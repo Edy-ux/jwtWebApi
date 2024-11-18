@@ -1,3 +1,11 @@
+using jwtWebApi.Services.UserService;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+
+
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,9 +14,29 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
 
+
+    });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
+builder.Services.AddAuthentication().AddJwtBearer();
+
+string[] words = ["Apple", "Banana", "Cherry "];
+string resul =
+    words[1].Substring(0, 3) +
+    words[2][2];
+    
+Console.WriteLine(resul);
 
 var app = builder.Build();
 

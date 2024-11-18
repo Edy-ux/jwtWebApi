@@ -2,6 +2,9 @@
 {
     public class UserService : IUserService
     {
-        
+        public string GetMyName()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
