@@ -1,21 +1,21 @@
 using jwtWebApi.Services.UserService;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-
-
-
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
@@ -24,12 +24,28 @@ builder.Services.AddSwaggerGen(options =>
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey
 
-
     });
-
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
-builder.Services.AddAuthentication().AddJwtBearer();
+
+builder.Services.AddAuthentication().AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+           builder.Configuration.GetSection("AppSettings:Token").Value!)
+            )
+         
+
+    };
+
+    var key = options.TokenValidationParameters.IssuerSigningKey;
+
+    Console.WriteLine(key.KeyId);
+});
 
 var app = builder.Build();
 

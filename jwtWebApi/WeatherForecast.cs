@@ -1,5 +1,4 @@
-﻿namespace jwtWebApi
-{
+﻿namespace jwtWebApi;
     public record WheaterForecast
     {
         public float TemperatureC { get; set; } 
@@ -9,4 +8,4 @@
 
     };
 
-}
+

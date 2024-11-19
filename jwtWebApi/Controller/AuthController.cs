@@ -6,8 +6,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace JwtWepApi.NET.Controller
-{
+namespace JwtWepApi.NET.Controller;
+
     [Route("api/v1/[controller]")]
     [ApiController]
     public class AuthController(IConfiguration configuration) : ControllerBase
@@ -58,7 +58,8 @@ namespace JwtWepApi.NET.Controller
 
             List<Claim> claims = new()
             {
-                new(ClaimTypes.Name, user.Username)
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, "Admin", null, "myaplication")
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
@@ -80,4 +81,4 @@ namespace JwtWepApi.NET.Controller
 
     }
 
-}
+

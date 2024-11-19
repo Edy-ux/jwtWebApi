@@ -2,24 +2,22 @@
 using Microsoft.AspNetCore.Mvc;
 
 
-namespace jwtWebApi.Controller
-{
+namespace jwtWebApi.Controller;
+
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class WheaterForecast() : ControllerBase
+    public class WheaterForecastController : ControllerBase
     {
 
-
-
-       private  static readonly string[] Summaries = new[]
-        {
+        private static readonly string[] Summaries = new[]
+         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        [HttpGet(Name = "GetWeatherForacast"), Authorize(Roles = "Admin")]
-        public IEnumerable<jwtWebApi.WheaterForecast> Get()
+        [HttpGet(Name = "GetWeatherForacast"), Authorize(Roles = "Admin, User")]
+        public IEnumerable<WheaterForecast> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new jwtWebApi.WheaterForecast
+            return Enumerable.Range(1, 5).Select(index => new WheaterForecast
             {
                 TemperatureC = Random.Shared.Next(-20, 30),
                 Date = DateTime.Now.AddDays(index),
@@ -29,5 +27,5 @@ namespace jwtWebApi.Controller
         }
     }
 
-}
+
 
