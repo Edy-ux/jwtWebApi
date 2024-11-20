@@ -1,9 +1,10 @@
-﻿namespace JwtWepApi.NET.Dto;
+﻿namespace JwtWepApi.Dto;
 
-    public class UserDto
-    {
-        public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+public class UserDto
+{
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string[]? Roles { get; set; } = [];
 
-    }
+}
 

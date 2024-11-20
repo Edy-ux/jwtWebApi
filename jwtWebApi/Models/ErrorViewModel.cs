@@ -1,6 +1,6 @@
 namespace jwtWebApi.Models
 {
-    public class User
+    public class ErrorViewModel
     {
         public string Username { get; set; }
 
