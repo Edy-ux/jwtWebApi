@@ -21,7 +21,7 @@ public class WheaterForecastController : ControllerBase
             Date = DateTime.Now.AddDays(index),
             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
 
-        });
+        }).ToArray(); ;
     }
 }
 

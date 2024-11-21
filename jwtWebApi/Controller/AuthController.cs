@@ -1,19 +1,15 @@
-﻿using jwtWebApi.Models;
-using jwtWebApi.Services.UserService;
-using JwtWepApi.Dto;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
 
-
-
-namespace JwtWepApi.Controller;
+namespace JwtWebApi.Controller;
 
 [Route("api/v1/[controller]")]
+
 [ApiController]
-public class AuthController : ControllerBase
+public class AuthController(ITokenService service) : ControllerBase
 {
+    private readonly static User user = new();
 
 
-    public static User user = new();
 
     [HttpPost("register")]
     public ActionResult<User> Register(UserDto request)
@@ -21,7 +17,6 @@ public class AuthController : ControllerBase
 
         string pw_hash
                = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
 
         user.Username = request.Username;
         user.PasswordHash = pw_hash;
@@ -32,22 +27,31 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public ActionResult<User> Login(UserDto request, [FromServices] ITokenService service)
+    public ActionResult<User> Login(UserDto request)
     {
+
+
         if (user.Username != request.Username)
-        {
-            return BadRequest("User Not Found");
-        }
+            BadRequest("User Not Found");
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-        {
-            return BadRequest("Wrong is Passoword");
-        }
+            BadRequest("Wrong is Passoword");
 
         string token = service.GenerateToken(user);
 
         return Ok(token);
 
+    }
+
+
+    [HttpGet, Authorize]
+    public ActionResult<object> GetMe()
+    {
+        var user = User?.Identity?.Name;
+        var userName = User.FindFirstValue(ClaimTypes.Name);
+        var role = User.FindAll(ClaimTypes.Role);
+
+        return Ok(new { user, userName, roles = string.Join(',', role.Select(c => c.Value)) });
     }
 }
 
