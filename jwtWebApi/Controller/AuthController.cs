@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using jwtWebApi.Services.Auth;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JwtWebApi.Controller;
 
 [Route("api/v1/[controller]")]
 
 [ApiController]
-public class AuthController(ITokenService service) : ControllerBase
+public class AuthController(ITokenService service, IAuthService authService) : ControllerBase
 {
     private readonly static User user = new();
 
-
+    private readonly IAuthService _authService = authService;
 
     [HttpPost("register")]
     public ActionResult<User> Register(UserDto request)
@@ -27,22 +29,21 @@ public class AuthController(ITokenService service) : ControllerBase
     }
 
     [HttpPost("login")]
-    public ActionResult<User> Login(UserDto request)
+    public ActionResult<object> Login(UserDto request)
     {
-
 
         if (user.Username != request.Username)
             BadRequest("User Not Found");
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             BadRequest("Wrong is Passoword");
+        //Gerar QR code if Login is sucessfull
 
-        string token = service.GenerateToken(user);
+        var token = service.GenerateToken(user);
 
         return Ok(token);
 
     }
-
 
     [HttpGet, Authorize]
     public ActionResult<object> GetMe()
@@ -53,6 +54,22 @@ public class AuthController(ITokenService service) : ControllerBase
 
         return Ok(new { user, userName, roles = string.Join(',', role.Select(c => c.Value)) });
     }
+
+    [HttpGet("generateqr")]
+    public ActionResult<string> GenerateQR(string email)
+    {
+
+        var (secretKey, qrCodeUrl) = _authService.GenerateTwoFactor(email);
+
+        return qrCodeUrl;
+    }
+
+    [HttpPost("validatecode")]
+    public ActionResult<bool> ValidateCode(string code, string key)
+    {   
+        return _authService.ValidateCode(code, key);
+    }
+
 }
 
 

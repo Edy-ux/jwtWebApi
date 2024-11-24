@@ -1,7 +1,7 @@
 ﻿
 
 global using jwtWebApi.Models;
-global using jwtWebApi.Services.UserService;
+global using jwtWebApi.Services.Token;
 global using JwtWebApi.Dto;
 
 

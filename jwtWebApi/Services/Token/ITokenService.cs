@@ -1,5 +1,5 @@
 ﻿
-namespace jwtWebApi.Services.UserService
+namespace jwtWebApi.Services.Token
 {
     public interface ITokenService
     {
