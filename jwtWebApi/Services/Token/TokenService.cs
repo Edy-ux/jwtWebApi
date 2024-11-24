@@ -20,7 +20,7 @@ namespace jwtWebApi.Services.Token
 
 
             var key = new SymmetricSecurityKey(ConvertSecretToBytes(
-                _configuration.GetSection("AppSettings:Token").Value!, false));
+                _configuration["Secret_key"]!));
 
             var token = new JwtSecurityToken(
                 issuer: user.Username,
@@ -35,7 +35,7 @@ namespace jwtWebApi.Services.Token
             return jwt;
         }
 
-        private static byte[] ConvertSecretToBytes(string secret, bool secretIsBase32) =>
+        private static byte[] ConvertSecretToBytes(string secret, bool secretIsBase32 = false) =>
               Encoding.UTF8.GetBytes(secret);
     }
 }
