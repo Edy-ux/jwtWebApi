@@ -1,5 +1,6 @@
 
 using Google.Authenticator;
+using jwtWebApi.Configuration;
 using jwtWebApi.Services.Auth;
 
 
@@ -10,6 +11,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<ITokenService, JWTTokenService>();
+//Configuration Options 
+
+
+builder.Services.Configure<ConfigurationOptions>(
+    builder.Configuration.GetSection(ConfigurationOptions.JWT));
+
+
+
+
 builder.Services.AddScoped<IAuthService>(opt =>
 {
     return  new GoogleAuthService(new TwoFactorAuthenticator());
@@ -35,7 +45,7 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        ValidateAudience = false,
+        ValidateAudience = true,
         ValidateIssuer = false,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
            builder.Configuration.GetSection("AppSettings:Token").Value!)

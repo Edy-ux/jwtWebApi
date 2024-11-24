@@ -1,10 +1,15 @@
 ﻿using Google.Authenticator;
+using jwtWebApi.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace jwtWebApi.Services.Token
 {
-    public class JWTTokenService(IConfiguration configuration) : ITokenService
+    public class JWTTokenService(IOptions<ConfigurationOptions> options) : ITokenService
     {
-        private readonly IConfiguration _configuration = configuration;
+
+        private readonly ConfigurationOptions _options = options.Value;
+
+        public string str = null!;
         public string GenerateToken(User user)
         {
             var handle = new JwtSecurityTokenHandler();
@@ -12,18 +17,19 @@ namespace jwtWebApi.Services.Token
             List<Claim> claims =
             [
                 new Claim(ClaimTypes.Name, user.Username),
+                
             ];
-
 
             foreach (var role in user.Roles!)
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
 
+            
             var key = new SymmetricSecurityKey(ConvertSecretToBytes(
-                _configuration["Secret_key"]!));
+                _options.Secret_Key, false));
 
             var token = new JwtSecurityToken(
-                issuer: user.Username,
+                issuer: "localhost",
                 claims: claims,
                 notBefore: DateTime.Now.AddSeconds(5),
                 expires: DateTime.Now.AddDays(1),
@@ -35,7 +41,7 @@ namespace jwtWebApi.Services.Token
             return jwt;
         }
 
-        private static byte[] ConvertSecretToBytes(string secret, bool secretIsBase32 = false) =>
+        private static byte[] ConvertSecretToBytes(string secret, bool secretIsBase32) =>
               Encoding.UTF8.GetBytes(secret);
     }
 }
