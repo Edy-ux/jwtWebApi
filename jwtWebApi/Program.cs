@@ -1,8 +1,7 @@
 
-using Google.Authenticator;
 using jwtWebApi.Configuration;
 using jwtWebApi.Services.Auth;
-
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,45 +9,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddControllers();
+
 builder.Services.AddScoped<ITokenService, JWTTokenService>();
+
 //Configuration Options 
-
-
 builder.Services.Configure<ConfigurationOptions>(
     builder.Configuration.GetSection(ConfigurationOptions.JWT));
 
-
-
-
-builder.Services.AddScoped<IAuthService>(opt =>
-{
-    return  new GoogleAuthService(new TwoFactorAuthenticator());
-});
-
-
-//builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddSwaggerGen(options =>
-{
-    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
-
-    });
-    options.OperationFilter<SecurityRequirementsOperationFilter>();
-});
-
 builder.Services.AddAuthentication().AddJwtBearer(options =>
 {
+
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        ValidateAudience = true,
+        ValidateAudience = false,
         ValidateIssuer = false,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-           builder.Configuration.GetSection("AppSettings:Token").Value!)
+           builder.Configuration.GetSection("JWT:Secret_Key").Value!)
             )
     };
 });
@@ -59,16 +37,15 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+   // app.UseSwagger();
+   // app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
-app.MapControllers();
-
 app.UseAuthorization();
 
+app.MapControllers();
 
 app.Run();
 

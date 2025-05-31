@@ -1,75 +1,66 @@
 ﻿
-using jwtWebApi.Services.Auth;
+using jwtWebApi.Models;
 using Microsoft.AspNetCore.Authorization;
-
+using Microsoft.AspNetCore.Mvc;
 namespace JwtWebApi.Controller;
 
 [Route("api/v1/[controller]")]
 
 [ApiController]
-public class AuthController(ITokenService service, IAuthService authService) : ControllerBase
+public class AuthController(ITokenService service, ILogger<AuthController> logger) : ControllerBase
 {
-    private readonly static User user = new();
 
-    private readonly IAuthService _authService = authService;
+    private readonly static List<User>? users = new List<User>();
+
+    private readonly ILogger<AuthController> _logger = logger;
 
     [HttpPost("register")]
-    public ActionResult<User> Register(UserDto request)
+    public IActionResult Register([FromBody] UserDto request)
     {
+        // Validate model using data annotamions
 
-        string pw_hash
-               = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+            _logger.LogWarning("Invalid registration. Erros: {Errors: }", string.Join(", ", errors));
+            return Problem("Invalid input: " + string.Join(", ", errors));
 
-        user.Username = request.Username;
-        user.PasswordHash = pw_hash;
-        user.Roles = request.Roles;
+        }
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        //Check if login already exist
+        if (users.SingleOrDefault(u => u.Login == request.Login) is not null)
+        {
 
-        return Ok(user);
+            _logger.LogWarning("Registration attempt with existent login: {Login} ", request.Login);
+            return Problem("User with given login already exists.");
+        }
+
+        var user = new User { Login = request.Login, Email = request.Email, PasswordHash = hashedPassword, UserName = request.Username!, Roles = request.Roles };
+
+        users.Add(user);
+        Console.WriteLine(user);
+        return Ok(Results.Created());
+
 
     }
 
     [HttpPost("login")]
-    public ActionResult<object> Login(UserDto request)
+    public IActionResult Login([FromBody] UserDto request)
     {
-
-        if (user.Username != request.Username)
-            BadRequest("User Not Found");
+        if (users?.SingleOrDefault(u => u.Login == request.Login) is not User user)
+        {
+            _logger.LogWarning("User with login: {Login} not found. ", request.Login);
+            return BadRequest("User doesn´t exist");
+        }
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            BadRequest("Wrong is Passoword");
-        //Gerar QR code if Login is sucessfull
+            BadRequest("Passoword is wrong! ");
 
         var token = service.GenerateToken(user);
 
         return Ok(token);
 
     }
-
-    [HttpGet, Authorize]
-    public ActionResult<object> GetMe()
-    {
-        var user = User?.Identity?.Name;
-        var userName = User.FindFirstValue(ClaimTypes.Name);
-        var role = User.FindAll(ClaimTypes.Role);
-
-        return Ok(new { user, userName, roles = string.Join(',', role.Select(c => c.Value)) });
-    }
-
-    [HttpGet("generateqr")]
-    public ActionResult<string> GenerateQR(string email)
-    {
-
-        var (secretKey, qrCodeUrl) = _authService.GenerateTwoFactor(email);
-
-        return qrCodeUrl;
-    }
-
-    [HttpPost("validatecode")]
-    public ActionResult<bool> ValidateCode(string code, string key)
-    {   
-        return _authService.ValidateCode(code, key);
-    }
-
 }
 
 

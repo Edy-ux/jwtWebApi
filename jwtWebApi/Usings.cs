@@ -19,14 +19,11 @@ global using System.IdentityModel.Tokens.Jwt;
 global using System.Security.Claims;
 //new Claim(ClaimTypes.Name, user.Username),
 
-global using Microsoft.AspNetCore.Mvc;
+//global using Microsoft.AspNetCore.Mvc;
 //  Api - CotrollerBase, BadRequest, Ok , HttpPostAttribute, ActionResult, FromServices,  HttpPost/Get/Delete/Update/ etc.
 
 global using Microsoft.OpenApi.Models;
 //  OpenApiSecurityScheme
 
-global using Swashbuckle.AspNetCore.Filters;
 //  SecurityRequirementsOperationFilter
 
-global using System.Text;
-//  Encoding
