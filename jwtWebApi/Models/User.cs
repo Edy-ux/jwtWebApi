@@ -1,8 +1,10 @@
-﻿namespace jwtWebApi.Models;
+﻿using jwtWebApi.Services;
+
+namespace jwtWebApi.Models;
 
 public class User
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string Login { get; set; } = string.Empty;
     public string UserName { get; set; }
     public string PasswordHash { get; set; } = string.Empty;
@@ -10,7 +12,7 @@ public class User
     public bool? EmailConfirmed { get; set; } = false;
     public string[]? Roles { get; set; } = [];
     public string Email { get; set; } = string.Empty;
-
+    public List<RefreshToken> RefreshTokens { get; set; } = new();
 
 }
 

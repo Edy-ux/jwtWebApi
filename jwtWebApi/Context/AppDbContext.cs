@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using jwtWebApi.Models;
+using jwtWebApi.Services;
 
 namespace TypesfRelationships.Context
 {
@@ -7,6 +8,8 @@ namespace TypesfRelationships.Context
     {
 
         public DbSet<User> Users { get; set; }
+
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
 
@@ -22,7 +25,10 @@ namespace TypesfRelationships.Context
 
             modelBuilder.Entity<User>().Property(x => x.PasswordHash).HasMaxLength(13).IsRequired();
 
-
+            modelBuilder.Entity<User>()
+                .HasMany(x => x.RefreshTokens)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId);
         }
 
     }

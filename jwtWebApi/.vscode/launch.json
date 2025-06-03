@@ -4,20 +4,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core JwTAPI (console)",
+            "name": ".NET Core JWTAPI (console)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
+            "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/bin/Debug/net9.0/JwtWebApi.dll",
             "args": [],
-            "cwd": "${workspaceFolder}",
+            "debugServer": "${workspaceFolder}/bin/Debug/net9.0/JwtWebApi.dll",
             "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_HOSTINGSTARTUPAPPLICATION": "app.dll"
+            },
+            "nativeDebugging": false,
             "console": "integratedTerminal"
-        },
-        {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach"
         }
     ]
 }

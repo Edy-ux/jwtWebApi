@@ -19,13 +19,13 @@ builder.Services.Configure<ConfigurationOptions>(
 builder.Services.AddAuthentication().AddJwtBearer(options =>
 {
 
-    // Configure JWT Bearer authentication
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
         ValidateAudience = true,
+        ValidAudience = builder.Configuration.GetSection("JWT:Audience").Value!,
         ValidateIssuer = false,
-        ValidAudience = "myapi",
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
            builder.Configuration.GetSection("JWT:Secret_Key").Value!)
             )
@@ -44,6 +44,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

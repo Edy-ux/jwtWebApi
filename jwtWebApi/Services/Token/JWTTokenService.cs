@@ -18,9 +18,11 @@ namespace jwtWebApi.Services.Token
 
             List<Claim> claims =
             [
-                    new Claim(JwtRegisteredClaimNames.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.Email, user.Email!),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Iat, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(),
+                    ClaimValueTypes.Integer64),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             ];
 
@@ -43,7 +45,6 @@ namespace jwtWebApi.Services.Token
 
             return jwt;
         }
-
         private static byte[] ConvertSecretToBytes(string secret, bool secretIsBase32 = false) =>
               Encoding.UTF8.GetBytes(secret);
     }

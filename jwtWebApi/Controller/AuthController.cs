@@ -10,16 +10,16 @@ namespace JwtWebApi.Controller;
 [Route("api/v1/[controller]")]
 
 [ApiController]
-public class AuthController(ITokenService service, ILogger<AuthController> logger) : ControllerBase
+public class AuthController(ITokenService service, ILogger<AuthController> _logger) : ControllerBase
 {
 
     private readonly static List<User>? users = new List<User>();
 
-    private readonly ILogger<AuthController> _logger = logger;
 
     [HttpPost("register")]
     public IActionResult Register([FromBody] UserDto request)
     {
+        ArgumentNullException.ThrowIfNull(request);
         // Validate model using data annotamions
         if (!ModelState.IsValid)
 
@@ -39,7 +39,7 @@ public class AuthController(ITokenService service, ILogger<AuthController> logge
         //Check if login already exist
         if (users?.SingleOrDefault(u => u.Login == request.Login) is not null)
         {
-            _logger.LogWarning("Registration attempted with existent login: {Login} ", request.Login);
+            _logger.LogWarning("Registration attempt with existent login: {Login} ", request.Login);
             return Conflict(new ProblemDetails { Title = "Conflict", Detail = "User already exists." }); // ProblemDetails;
         }
 
@@ -57,7 +57,7 @@ public class AuthController(ITokenService service, ILogger<AuthController> logge
     {
         if (users?.SingleOrDefault(u => u.Login == request.Login) is not User user || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            _logger.LogWarning("Invalid loggin atempt for username {Useraame}", request.Login);
+            _logger.LogWarning("Invalid loggin attempt for username {Useraame}", request.Login);
             return BadRequest("Invalid username or password");
         }
 

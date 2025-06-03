@@ -1,4 +1,5 @@
-﻿using JwtWebApi.Dto;
+﻿using System.Net;
+using JwtWebApi.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,15 +14,24 @@ public class UserController : ControllerBase
     {
 
     }
-    [HttpGet("profile"), Authorize(Roles = "Premium, Admin")]
+    [HttpGet("profile"), Authorize(Roles = "Admin")]
     public ActionResult<UserDto> GetProfile()
     {
-        var user = User?.Identity.Name; // From JWT token
+        if (!User.IsInRole("Premium, Admin"))
+            return Forbid();
+
+        var name = User?.Identity.Name; // From JWT token
         var email = User?.FindFirstValue(ClaimTypes.Email); //// From JWT Claims token
-        var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier)
+        ; // From JWT Claims token
         var roles = User?.FindAll(ClaimTypes.Role);
 
-        return Ok(new UserDto { Username = user, Email = email, Roles = roles?.Select(r => r.Value).ToArray() });
+        if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(new { Title = "Unauthorized", Detail = "User not authenticated or profile information is missing." });
+        }
+
+        return Ok(new { Username = name, Email = email, userId, Roles = roles?.Select(r => r.Value).ToArray() });
 
     }
 }

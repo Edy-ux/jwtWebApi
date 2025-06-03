@@ -1,6 +1,0 @@
-@WebApiAuthentication_HostAddress = http://localhost:5233
-
-POST {{WebApiAuthentication_HostAddress}}/api/v1/auth/
-Accept: application/json
-
-###
