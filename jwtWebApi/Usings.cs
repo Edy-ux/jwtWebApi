@@ -1,9 +1,5 @@
 ﻿
 
-global using jwtWebApi.Models;
-global using jwtWebApi.Services.Token;
-global using JwtWebApi.Dto;
-
 
 global using Microsoft.IdentityModel.Tokens;
 //   TokenValidationParameters,
@@ -23,7 +19,8 @@ global using System.Security.Claims;
 //  Api - CotrollerBase, BadRequest, Ok , HttpPostAttribute, ActionResult, FromServices,  HttpPost/Get/Delete/Update/ etc.
 
 global using Microsoft.OpenApi.Models;
+
+
 //  OpenApiSecurityScheme
 
 //  SecurityRequirementsOperationFilter
-

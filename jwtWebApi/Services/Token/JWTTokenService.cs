@@ -1,9 +1,8 @@
 ﻿using jwtWebApi.Configuration;
 using jwtWebApi.Models;
+using JwtWebApi.Controller;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+
 using System.Text;
 
 namespace jwtWebApi.Services.Token
@@ -19,22 +18,22 @@ namespace jwtWebApi.Services.Token
 
             List<Claim> claims =
             [
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email)
-
+                    new Claim(JwtRegisteredClaimNames.Name, user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             ];
 
             foreach (var role in user.Roles!)
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
-
-
             var key = new SymmetricSecurityKey(ConvertSecretToBytes(
                 _options.Secret_Key));
 
             var token = new JwtSecurityToken(
-                issuer: _options.Issuer,
+                issuer: nameof(AuthController),
                 claims: claims,
+                audience: _options.Audience,
                 notBefore: DateTime.Now.AddSeconds(5),
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)

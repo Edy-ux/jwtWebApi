@@ -1,0 +1,12 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "msbuild",
+            "problemMatcher": ["$msCompile"],
+            "group": "build",
+            "label": "Build: jwtWebApi.csproj",
+            "detail": "Build the jwtWebApi.csproj project using dotnet build"
+        }
+    ]
+}
