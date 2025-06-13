@@ -1,46 +1,39 @@
-
 using jwtWebApi.Configuration;
+using jwtWebApi.Extentions;
 using jwtWebApi.Services.Token;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddDataAnnotationsLocalization();
 
-builder.Services.AddScoped<ITokenService, JWTTokenService>();
 
 //Configuration Options 
 builder.Services.Configure<ConfigurationOptions>(
     builder.Configuration.GetSection(ConfigurationOptions.JWT));
 
-builder.Services.AddAuthentication().AddJwtBearer(options =>
-{
+//Add Services 
+builder.Services.AddScoped<ITokenService, JWTTokenService>();
+builder.Services.AddApiInternacionalization();
+builder.Services.AddAuthenticationService(builder.Configuration);
 
-
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration.GetSection("JWT:Audience").Value!,
-        ValidateIssuer = false,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-           builder.Configuration.GetSection("JWT:Secret_Key").Value!)
-            )
-    };
-});
 
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+//Add Localization and Internationalization
+app.UseApiInternacionalization();
+
+// Configure the HTTP request pipeline.i
 if (app.Environment.IsDevelopment())
 {
-    // app.UseSwagger();
+    // app.UseSwagger
     // app.UseSwaggerUI();
 }
+
+
 
 app.UseHttpsRedirection();
 

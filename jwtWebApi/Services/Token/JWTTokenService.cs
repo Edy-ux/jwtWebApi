@@ -1,6 +1,6 @@
 ﻿using jwtWebApi.Configuration;
 using jwtWebApi.Models;
-using JwtWebApi.Controller;
+using JwtWebApi.Controllers;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 using System.Text;

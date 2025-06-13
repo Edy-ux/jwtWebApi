@@ -1,10 +1,9 @@
 ﻿
 using jwtWebApi.Models;
 using jwtWebApi.Services.Token;
-using Microsoft.AspNetCore.Mvc;
 using JwtWebApi.Dto;
-using jwtWebApi.Application.Interfaces;
-namespace JwtWebApi.Controller;
+using Microsoft.AspNetCore.Mvc;
+namespace JwtWebApi.Controllers;
 
 
 [Route("api/v1/[controller]")]
@@ -27,7 +26,9 @@ public class AuthController(ITokenService _tokenService, ILogger<AuthController>
         {
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
             _logger.LogWarning("Invalid registration Erros: {Errors: }", string.Join(", ", errors));
-            return Problem("Invalid input: " + string.Join(", ", errors));
+            // return Problem("Invalid input: " + string.Join(", ", errors));
+
+            return BadRequest(ModelState);
 
         }
 
@@ -35,6 +36,7 @@ public class AuthController(ITokenService _tokenService, ILogger<AuthController>
         //Check if password and confirm password match
         if (request.Password != request.ConfirmePassword)
         {
+            _logger.LogWarning("Invalid registration Erros");
             return BadRequest(new { Title = "Bad Request", Detail = "Password and Confirm Password do not match." });
         }
         //Check if login already exist
@@ -44,7 +46,7 @@ public class AuthController(ITokenService _tokenService, ILogger<AuthController>
             return Conflict(new ProblemDetails { Title = "Conflict", Detail = "User already exists." }); // ProblemDetails;
         }
 
-        var user = new User { Login = request.Login, Email = request.Email, PasswordHash = hashedPassword, ConfirmePassword = request.ConfirmePassword, UserName = request.Username!, Roles = request.Roles };
+        var user = new User { Login = request.Login, PasswordHash = hashedPassword, Email = request.Login, ConfirmePassword = request.ConfirmePassword, UserName = request.Username!, Roles = request.Roles };
 
         users.Add(user);
         _logger.LogInformation("User registered with login {Login} successfully", user.Login);

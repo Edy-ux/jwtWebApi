@@ -3,7 +3,7 @@ using JwtWebApi.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace jwtWebApi.Controller;
+namespace jwtWebApi.Controllers;
 
 [Route("api/v1/[controller]")]
 [ApiController]
@@ -14,11 +14,11 @@ public class UserController : ControllerBase
     {
 
     }
-    [HttpGet("profile"), Authorize(Roles = "Admin")]
+    [HttpGet("profile"), Authorize(Roles = "Admin, Premium")]
     public ActionResult<UserDto> GetProfile()
     {
-        if (!User.IsInRole("Premium, Admin"))
-            return Forbid();
+        if (!User.IsInRole("Premium"))
+              return Forbid();
 
         var name = User?.Identity.Name; // From JWT token
         var email = User?.FindFirstValue(ClaimTypes.Email); //// From JWT Claims token
