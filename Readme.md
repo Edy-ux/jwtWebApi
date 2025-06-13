@@ -17,8 +17,15 @@ API de autenticação JWT com refresh token, modelagem segura e boas práticas e
     - [2. Login e obtenção de tokens](#2-login-e-obtenção-de-tokens)
     - [3. Acesso a endpoint protegido](#3-acesso-a-endpoint-protegido)
     - [4. Renovar JWT usando refresh token](#4-renovar-jwt-usando-refresh-token)
+  - [Como rodar](#como-rodar)
   - [Fluxo de Autenticação e Refresh Token](#fluxo-de-autenticação-e-refresh-token)
   - [Boas Práticas e Segurança](#boas-práticas-e-segurança)
+- [🌐 Mensagens de Erro e Validação com Tradução Automática](#-mensagens-de-erro-e-validação-com-tradução-automática)
+  - [✅ Como funciona](#-como-funciona)
+  - [📥 Exemplo de envio com cultura definida](#-exemplo-de-envio-com-cultura-definida)
+  - [🔎 Exemplo de resposta de erro (en-US)](#-exemplo-de-resposta-de-erro-en-us)
+  - [📁 Estrutura de Localização](#-estrutura-de-localização)
+  - [⚙️ Configuração em `Program.cs`](#️-configuração-em-programcs)
   - [Como Contribuir](#como-contribuir)
 
 ---
@@ -142,7 +149,15 @@ Content-Type: application/json
 }
 ```
 
----
+
+**Migrations e EF Core**
+## Como rodar
+
+```bash
+dotnet restore
+dotnet ef database update
+dotnet run
+```
 
 ## Fluxo de Autenticação e Refresh Token
 
@@ -163,6 +178,84 @@ Content-Type: application/json
 
 ---
 
+
+
+# 🌐 Mensagens de Erro e Validação com Tradução Automática
+
+Esta API possui suporte completo a **localização (i18n)** para mensagens de **validação de dados**, retornando os erros automaticamente no idioma apropriado com base na cultura definida na requisição.
+
+## ✅ Como funciona
+
+- A API utiliza **Data Annotations** em conjunto com arquivos `.resx` de tradução.
+- A cultura (`CultureInfo`) é detectada automaticamente via header HTTP `Accept-Language`.
+- Atualmente são suportados os idiomas:
+  - `pt-BR` (Português do Brasil)
+  - `en-US` (Inglês Americano)
+
+## 📥 Exemplo de envio com cultura definida
+
+Ao fazer uma requisição HTTP para a API, basta definir o cabeçalho:
+
+```http
+Accept-Language: en-US
+```
+
+Ou:
+
+```http
+Accept-Language: pt-BR
+```
+
+A resposta de erro de validação será retornada automaticamente no idioma solicitado.
+
+## 🔎 Exemplo de resposta de erro (en-US)
+
+```json
+{
+  "errors": {
+    "Password": [
+      "Password must be at least 6 characters long."
+    ]
+  }
+}
+```
+
+## 📁 Estrutura de Localização
+
+Os arquivos de tradução estão localizados na pasta:
+
+```
+/Resources/JwtWebApi.Dto.UserDto.[cultura].resx
+```
+
+Por exemplo:
+
+- `JwtWebApi.Dto.UserDto.en-US.resx`
+- `JwtWebApi.Dto.UserDto.pt-BR.resx`
+
+## ⚙️ Configuração em `Program.cs`
+
+```csharp
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+builder.Services.AddControllers()
+    .AddDataAnnotationsLocalization();
+
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("pt-BR"),
+    SupportedCultures = new[] { new CultureInfo("pt-BR"), new CultureInfo("en-US") },
+    SupportedUICultures = new[] { new CultureInfo("pt-BR"), new CultureInfo("en-US") }
+});
+```
+
+**Dúvidas ou sugestões?**  
+Abra uma issue ou entre em contato!
+
+---
+
+
+
 ## Como Contribuir
 
 1. Faça um fork do projeto
@@ -170,10 +263,5 @@ Content-Type: application/json
 3. Commit suas alterações (`git commit -am 'Adiciona nova feature'`)
 4. Push para a branch (`git push origin feature/nova-feature`)
 5. Abra um Pull Request
-
----
-
-**Dúvidas ou sugestões?**  
-Abra uma issue ou entre em contato!
 
 ---
