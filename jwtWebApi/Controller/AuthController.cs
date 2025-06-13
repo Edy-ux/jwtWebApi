@@ -3,20 +3,21 @@ using jwtWebApi.Models;
 using jwtWebApi.Services.Token;
 using Microsoft.AspNetCore.Mvc;
 using JwtWebApi.Dto;
-
+using jwtWebApi.Application.Interfaces;
 namespace JwtWebApi.Controller;
 
 
 [Route("api/v1/[controller]")]
 
 [ApiController]
-public class AuthController(ITokenService service, ILogger<AuthController> _logger) : ControllerBase
+public class AuthController(ITokenService _tokenService, ILogger<AuthController> _logger) : ControllerBase
 {
 
     private readonly static List<User>? users = new List<User>();
 
 
     [HttpPost("register")]
+
     public IActionResult Register([FromBody] UserDto request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -62,7 +63,7 @@ public class AuthController(ITokenService service, ILogger<AuthController> _logg
         }
 
 
-        var token = service.GenerateToken(user);
+        var token = _tokenService.GenerateToken(user);
         _logger.LogInformation("Successful login for username: {Useraame}", request.Login);
 
         Response.Headers["jwt-token"] = token;
@@ -70,6 +71,9 @@ public class AuthController(ITokenService service, ILogger<AuthController> _logg
         return Ok(token);
 
     }
+
+
+
 }
 
 

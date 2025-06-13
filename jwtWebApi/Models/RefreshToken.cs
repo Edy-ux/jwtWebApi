@@ -1,6 +1,6 @@
 ﻿using jwtWebApi.Models;
 
-namespace jwtWebApi.Services;
+namespace jwtWebApi.Models;
 
 public class RefreshToken
 {
@@ -9,6 +9,6 @@ public class RefreshToken
     public bool IsExpired => DateTime.UtcNow >= Expires;
     public DateTime Created { get; set; }
     public string CreatedByIp { get; set; } = string.Empty;
-    public int UserId { get; set; }
-    public User User { get; set; } = new User();
+    public Guid UserId { get; set; }
+    public User User { get; set; } = new();
 }

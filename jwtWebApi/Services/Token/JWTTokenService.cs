@@ -2,7 +2,7 @@
 using jwtWebApi.Models;
 using JwtWebApi.Controller;
 using Microsoft.Extensions.Options;
-
+using System.Security.Cryptography;
 using System.Text;
 
 namespace jwtWebApi.Services.Token
@@ -45,7 +45,38 @@ namespace jwtWebApi.Services.Token
 
             return jwt;
         }
+
+        public RefreshToken GenerateRefreshToken(string ipAddress)
+        {
+            if (string.IsNullOrWhiteSpace(ipAddress))
+                throw new ArgumentNullException(nameof(ipAddress), "IP address cannot be null or empty.");
+
+            byte[] randomBytes = GenerateRandomBytes();
+
+            return new RefreshToken
+            {
+                Token = Convert.ToBase64String(randomBytes),
+                Expires = DateTime.UtcNow.AddDays(7),
+                Created = DateTime.UtcNow,
+                CreatedByIp = ipAddress
+
+            };
+        }
         private static byte[] ConvertSecretToBytes(string secret, bool secretIsBase32 = false) =>
               Encoding.UTF8.GetBytes(secret);
+
+        private static byte[] GenerateRandomBytes(byte length = 64)
+        {
+
+            if (length > 255)
+                throw new ArgumentOutOfRangeException(nameof(length), "Length must be less than or equal to 255.");
+
+            var randomBytes = new byte[length];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+
+            return randomBytes;
+        }
+
     }
 }
