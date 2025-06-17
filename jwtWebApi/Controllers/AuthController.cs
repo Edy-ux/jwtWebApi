@@ -63,9 +63,8 @@ public class AuthController : ControllerBase
             Login = request.Login,
             PasswordHash = hashedPassword,
             Email = request.Login,
-            ConfirmePassword = request.ConfirmePassword,
             UserName = request.Username!,
-            Roles = request.Roles ?? new string[] { "User" },
+            Roles = request.Roles ?? ["User"],
         };
         try
         {

@@ -11,9 +11,6 @@ public class User
 
     [Required(ErrorMessage = "Password is required.")]
     public string PasswordHash { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "ConfirmePassword is required.")]
-    public string? ConfirmePassword { get; set; } = string.Empty;
     public bool? EmailConfirmed { get; set; } = false;
     public string[]? Roles { get; set; } = [];
 
