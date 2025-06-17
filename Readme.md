@@ -26,6 +26,7 @@ API de autenticação JWT com refresh token, modelagem segura e boas práticas e
   - [🔎 Exemplo de resposta de erro (en-US)](#-exemplo-de-resposta-de-erro-en-us)
   - [📁 Estrutura de Localização](#-estrutura-de-localização)
   - [⚙️ Configuração em `Program.cs`](#️-configuração-em-programcs)
+  - [Exemplo usando placeholdes `Program.cs`.](#exemplo-usando-placeholdes-programcs)
   - [Como Contribuir](#como-contribuir)
 
 ---
@@ -220,12 +221,15 @@ A resposta de erro de validação será retornada automaticamente no idioma soli
 }
 ```
 
+
+
 ## 📁 Estrutura de Localização
 
 Os arquivos de tradução estão localizados na pasta:
 
 ```
 /Resources/JwtWebApi.Dto.UserDto.[cultura].resx
+/Resources/Outros..
 ```
 
 Por exemplo:
@@ -249,11 +253,39 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 });
 ```
 
+## Exemplo usando placeholdes `Program.cs`.
+
+Como substituir values em tempo de execução.
+
+/Resoures/`OrderMessages.resx`
+```xml
+<data name="OrderNotification" xml:space="preserve">
+  <value>Your order ("{0}") has been shipped and is on its way to "{1}".</value>
+</data>
+
+```
+
+```csharp
+app.MapGet("/{orderId}/{address}", (IStringLocalizerFactory factory, string orderId, string address) =>
+{
+    var localizer = factory.Create("OrderMessages", typeof(Program).Assembly.GetName().Name!);
+
+    //logica para obter a mensagem de notificação do pedido
+
+    // Substituindo os placeholders {0} e {1}
+
+    string message = string.Format(localizer["OrderNotification"], orderId, address);
+
+    return message;
+});
+
+
+```
+
 **Dúvidas ou sugestões?**  
 Abra uma issue ou entre em contato!
 
 ---
-
 
 
 ## Como Contribuir

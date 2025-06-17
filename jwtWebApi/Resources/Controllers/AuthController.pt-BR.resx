@@ -122,7 +122,7 @@
     <comment/>
   </data>
   <data name="ValidRegistration" xml:space="preserve">
-    <value>Sucesso no registo de usuário com login: {0} em:  {1:MMMM dd, yyyy}</value>
+    <value>Sucesso no registo do usuário com login: {0} em:  {1:MMMM dd, yyyy}</value>
     <comment/>
   </data>
 </root>
