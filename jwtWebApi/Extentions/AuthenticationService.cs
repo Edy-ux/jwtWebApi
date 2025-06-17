@@ -1,5 +1,4 @@
-﻿using jwtWebApi.Configuration;
-using Microsoft.Extensions.Options;
+﻿
 using System.Text;
 
 namespace jwtWebApi.Extentions;

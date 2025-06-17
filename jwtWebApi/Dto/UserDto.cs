@@ -14,8 +14,8 @@ public class UserDto
     [StringLength(50, MinimumLength = 3, ErrorMessage = "NameLength")]
     public string Username { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "PasswordLength")]
-    [StringLength(100, MinimumLength = 6, ErrorMessage = nameof(Password))]
+    [Required(ErrorMessage = "PasswordRequired")]
+    [StringLength(20, MinimumLength = 6, ErrorMessage = "PasswordLength")]
     public string Password { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "ConfirmPasswordRequired")]

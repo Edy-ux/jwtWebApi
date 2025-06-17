@@ -60,7 +60,7 @@ Ideal para estudos, portfólio e como base para aplicações reais.
 
 4. **Rode as migrations**
    ```sh
-   dotnet ef database update
+    
    ```
 
 5. **Execute a aplicação**

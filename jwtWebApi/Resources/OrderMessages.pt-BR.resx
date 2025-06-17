@@ -117,31 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ConfirmePassword" xml:space="preserve">
-    <value>A senha e confirmação da senha não correspondem.</value>
-  </data>
-  <data name="Login" xml:space="preserve">
-    <value>O login deve ser um e-mail válido.</value>
-  </data>
-  <data name="PasswordLength" xml:space="preserve">
-    <value>A senha deve ter no mínimo 6 caracteres.</value>
-  </data>
-  <data name="PasswordMismatch" xml:space="preserve">
-    <value>A senha e a confirmação não coincidem.</value>
-  </data>
-  <data name="NameRequired" xml:space="preserve">
-    <value>O campo Nome é obrigatório.</value>
-  </data>
-  <data name="NameLength" xml:space="preserve">
-    <value>O nome deve ter entre 2 e 50 caracteres</value>
-  </data>
-  <data name="LoginRequired" xml:space="preserve">
-    <value>O campo Login é obrigatório</value>
-  </data>
-  <data name="ConfirmPasswordRequired" xml:space="preserve">
-    <value>A confirmação de senha é obrigatória. </value>
-  </data>
-  <data name="PasswordRequired" xml:space="preserve">
-    <value>A senha é obrigatória.</value>
+  <data name="OrderNotification" xml:space="preserve">
+    <value>Seu pedido {0} foi enviado e está a caminho de "{1}".</value>
   </data>
 </root>

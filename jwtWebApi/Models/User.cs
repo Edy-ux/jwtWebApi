@@ -3,7 +3,7 @@ namespace jwtWebApi.Models;
 
 public class User
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; }
 
     [Required(ErrorMessage = "Login is required.")]
     public string Login { get; set; } = string.Empty;

@@ -1,20 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using jwtWebApi.Models;
-using jwtWebApi.Services;
 
-namespace TypesfRelationships.Context
+namespace jwtWebApi.Context
 {
     public class AppDbContext : DbContext
     {
 
+
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-
-        }
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +25,10 @@ namespace TypesfRelationships.Context
                 .HasMany(x => x.RefreshTokens)
                 .WithOne(x => x.User)
                 .HasForeignKey(x => x.UserId);
+
+            modelBuilder.Entity<User>()
+               .Property(u => u.PasswordHash)
+               .HasMaxLength(100);
         }
 
     }

@@ -13,7 +13,7 @@ public static class ApiInternacionalizationService
 
     public static WebApplication UseApiInternacionalization(this WebApplication app)
     {
-        var supportedCultures = new[] { "pt-BR", "en-US" };
+        var supportedCultures = new string[] { "pt-BR", "en-US" };
         var localizationOptions = new RequestLocalizationOptions()
             .SetDefaultCulture("pt-BR")
             .AddSupportedCultures(supportedCultures)

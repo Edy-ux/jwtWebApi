@@ -1,0 +1,2 @@
+GET https://localhost:7297/auth/test-localizer
+Header: Accept-Language: en-US

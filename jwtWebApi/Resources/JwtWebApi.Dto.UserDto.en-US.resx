@@ -123,7 +123,7 @@
   <data name="Login" xml:space="preserve">
     <value>The login must be a valid email.</value>
   </data>
-  <data name="PasswordLength " xml:space="preserve">
+  <data name="PasswordLength" xml:space="preserve">
     <value>The password must at least 6 characters.</value>
   </data>
   <data name="PasswordMismatch" xml:space="preserve">
@@ -136,10 +136,12 @@
     <value>Name must be between 2 and 50 characters.</value>
   </data>
   <data name="LoginRequired" xml:space="preserve">
-    <value>The Login field is required.
-</value>
+    <value>The Login field is required.</value>
   </data>
   <data name="ConfirmPasswordRequired" xml:space="preserve">
     <value>Confirm password is required.</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>The password is required</value>
   </data>
 </root>

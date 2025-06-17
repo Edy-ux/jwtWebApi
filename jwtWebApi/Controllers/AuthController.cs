@@ -1,31 +1,46 @@
 ﻿
+using System.Globalization;
+using System.Threading.Tasks;
+using jwtWebApi.Application.Interfaces;
 using jwtWebApi.Models;
 using jwtWebApi.Services.Token;
 using JwtWebApi.Dto;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 namespace JwtWebApi.Controllers;
 
 
 [Route("api/v1/[controller]")]
 
 [ApiController]
-public class AuthController(ITokenService _tokenService, ILogger<AuthController> _logger) : ControllerBase
+public class AuthController : ControllerBase
 {
+    // private readonly static List<User>? users = new List<User>();
+    private readonly IStringLocalizer _localizer;
+    private readonly ITokenService _tokenService;
 
-    private readonly static List<User>? users = new List<User>();
+    private readonly IUserService? _userService;
+    private readonly ILogger<AuthController> _logger;
 
+    public AuthController(ITokenService tokenService, ILogger<AuthController> logger, IStringLocalizerFactory factory, IUserService userService)
+    {
+        _tokenService = tokenService;
+        _userService = userService;
+        _logger = logger;
+        _localizer = factory.Create("Controllers.AuthController", typeof(AuthController).Assembly.GetName().Name!);
+    }
 
     [HttpPost("register")]
 
-    public IActionResult Register([FromBody] UserDto request)
+    public async Task<IActionResult> Register([FromBody] UserDto request)
     {
         ArgumentNullException.ThrowIfNull(request);
         // Validate model using data annotamions
         if (!ModelState.IsValid)
-
         {
+
             var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-            _logger.LogWarning("Invalid registration Erros: {Errors: }", string.Join(", ", errors));
+            //  _logger.LogWarning(string.Format(_localizer["InvalidLogin"], string.Join(", ", errors)));
             // return Problem("Invalid input: " + string.Join(", ", errors));
 
             return BadRequest(ModelState);
@@ -33,40 +48,56 @@ public class AuthController(ITokenService _tokenService, ILogger<AuthController>
         }
 
         string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
         //Check if password and confirm password match
+
         if (request.Password != request.ConfirmePassword)
         {
-            _logger.LogWarning("Invalid registration Erros");
+            _logger.LogWarning("Registration attempt with mismatched passwords for login: {Login} ", request.Login);
             return BadRequest(new { Title = "Bad Request", Detail = "Password and Confirm Password do not match." });
         }
         //Check if login already exist
-        if (users?.SingleOrDefault(u => u.Login == request.Login) is not null)
+
+        var user = new User
         {
-            _logger.LogWarning("Registration attempt with existent login: {Login} ", request.Login);
-            return Conflict(new ProblemDetails { Title = "Conflict", Detail = "User already exists." }); // ProblemDetails;
+            Login = request.Login,
+            PasswordHash = hashedPassword,
+            Email = request.Login,
+            ConfirmePassword = request.ConfirmePassword,
+            UserName = request.Username!,
+            Roles = request.Roles ?? new string[] { "User" },
+        };
+        try
+        {
+
+            var createdUser = await _userService!.InsertUserAsync(user);
+
+            if (createdUser is not null)
+                _logger.LogInformation(string.Format(_localizer["ValidRegistration"], user.Login, DateTime.UtcNow));
+            return CreatedAtAction(nameof(Register), new { login = createdUser?.Email, userName = createdUser?.UserName, Title = "User registered successfully" });
+
         }
-
-        var user = new User { Login = request.Login, PasswordHash = hashedPassword, Email = request.Login, ConfirmePassword = request.ConfirmePassword, UserName = request.Username!, Roles = request.Roles };
-
-        users.Add(user);
-        _logger.LogInformation("User registered with login {Login} successfully", user.Login);
-        return CreatedAtAction(nameof(Register), new { login = user.Login, userName = user.UserName, Title = "User registered successfully" });
+        catch (Exception ex)
+        {
+            // TODO
+            _logger.LogWarning("Registration attempt with existent login: {Login} ", request.Login);
+            return Conflict(new ProblemDetails { Title = "Conflict", Detail = ex.Message }); // ProblemDetails;
+        }
 
 
     }
 
     [HttpPost("login")]
-    public IActionResult Login([FromBody] UserDtoLogin request)
+    public async Task<IActionResult> Login([FromBody] UserDtoLogin request)
     {
-        if (users?.SingleOrDefault(u => u.Login == request.Login) is not User user || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        if (await _userService?.GetUserByLogin(request.Login)! is not User user || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            _logger.LogWarning("Invalid loggin attempt for username {Useraame}", request.Login);
+            _logger.LogWarning(_localizer["InvalidLogin"], request.Login);
             return BadRequest("Invalid username or password");
         }
 
-
         var token = _tokenService.GenerateToken(user);
-        _logger.LogInformation("Successful login for username: {Useraame}", request.Login);
+        _logger.LogInformation("Successful login for username: {Username}", request.Login);
 
         Response.Headers["jwt-token"] = token;
 
@@ -74,6 +105,18 @@ public class AuthController(ITokenService _tokenService, ILogger<AuthController>
 
     }
 
+    [HttpGet("test-localizer")]
+    public IActionResult Test()
+    {
+        var currentCulture = CultureInfo.CurrentUICulture.Name;
+        var message = _localizer["ValidRegistration"];
+
+        return Ok(new
+        {
+            translatedMessage = message.Value,
+            currentCulture,
+        });
+    }
 
 
 }
