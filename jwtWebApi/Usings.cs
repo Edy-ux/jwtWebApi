@@ -18,8 +18,6 @@ global using System.Security.Claims;
 //global using Microsoft.AspNetCore.Mvc;
 //  Api - CotrollerBase, BadRequest, Ok , HttpPostAttribute, ActionResult, FromServices,  HttpPost/Get/Delete/Update/ etc.
 
-global using Microsoft.OpenApi.Models;
-
 
 //  OpenApiSecurityScheme
 

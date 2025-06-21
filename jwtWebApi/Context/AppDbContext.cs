@@ -29,6 +29,10 @@ namespace jwtWebApi.Context
             modelBuilder.Entity<User>()
                .Property(u => u.PasswordHash)
                .HasMaxLength(100);
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasKey(rt => rt.Id);
+
         }
 
     }

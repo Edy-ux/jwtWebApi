@@ -14,6 +14,8 @@ namespace jwtWebApi.Application.Interfaces
         Task<User?> GetUserByIdAsync(int id);
         Task<User?> GetUserByLogin(string login);
 
+        Task<(string accessToken, string refreshToken)> AuthenticateAsync(string login, string password, string ipAddress);
+
     }
 }
 

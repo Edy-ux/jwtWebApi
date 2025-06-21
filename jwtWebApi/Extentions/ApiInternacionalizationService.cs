@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace jwtWebApi.Extentions;
+﻿namespace jwtWebApi.Extentions;
 
 public static class ApiInternacionalizationService
 {

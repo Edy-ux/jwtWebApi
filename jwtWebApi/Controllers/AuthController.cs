@@ -1,6 +1,5 @@
 ﻿
 using System.Globalization;
-using System.Threading.Tasks;
 using jwtWebApi.Application.Interfaces;
 using jwtWebApi.Models;
 using jwtWebApi.Services.Token;
@@ -17,14 +16,11 @@ public class AuthController : ControllerBase
 {
     // private readonly static List<User>? users = new List<User>();
     private readonly IStringLocalizer _localizer;
-    private readonly ITokenService _tokenService;
-
     private readonly IUserService? _userService;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(ITokenService tokenService, ILogger<AuthController> logger, IStringLocalizerFactory factory, IUserService userService)
+    public AuthController(ILogger<AuthController> logger, IStringLocalizerFactory factory, IUserService userService)
     {
-        _tokenService = tokenService;
         _userService = userService;
         _logger = logger;
         _localizer = factory.Create("Controllers.AuthController", typeof(AuthController).Assembly.GetName().Name!);
@@ -95,12 +91,21 @@ public class AuthController : ControllerBase
             return BadRequest("Invalid username or password");
         }
 
-        var token = _tokenService.GenerateToken(user);
+
+        var (token, accessToken) = await _userService.AuthenticateAsync(user.Login, request.Password, HttpContext.Connection.RemoteIpAddress?.ToString()!);
         _logger.LogInformation("Successful login for username: {Username}", request.Login);
 
         Response.Headers["jwt-token"] = token;
+        Response.Headers["access-token"] = accessToken;
 
-        return Ok(token);
+        return Ok(new
+        {
+            token,
+            accessToken,
+            userId = user.Id,
+            userName = user.UserName,
+            roles = user.Roles ?? ["User"]
+        });
 
     }
 

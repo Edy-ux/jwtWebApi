@@ -1,5 +1,4 @@
-﻿using System.Net;
-using JwtWebApi.Dto;
+﻿using JwtWebApi.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +17,7 @@ public class UserController : ControllerBase
     public ActionResult<UserDto> GetProfile()
     {
         if (!User.IsInRole("Premium"))
-              return Forbid();
+            return Forbid();
 
         var name = User?.Identity.Name; // From JWT token
         var email = User?.FindFirstValue(ClaimTypes.Email); //// From JWT Claims token

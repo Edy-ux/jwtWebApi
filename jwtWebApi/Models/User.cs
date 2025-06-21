@@ -3,20 +3,24 @@ namespace jwtWebApi.Models;
 
 public class User
 {
-    public Guid Id { get; set; }
 
-    [Required(ErrorMessage = "Login is required.")]
+    private readonly List<RefreshToken> _refreshTokens = new();
+    public IReadOnlyCollection<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
+    public Guid Id { get; set; }
     public string Login { get; set; } = string.Empty;
     public string UserName { get; set; }
-
-    [Required(ErrorMessage = "Password is required.")]
     public string PasswordHash { get; set; } = string.Empty;
     public bool? EmailConfirmed { get; set; } = false;
     public string[]? Roles { get; set; } = [];
-
-    [EmailAddress(ErrorMessage = "Invalid email address.")]
     public string Email { get; set; } = string.Empty;
-    public List<RefreshToken> RefreshTokens { get; set; } = new();
+
+
+    public void AddRefreshToken(RefreshToken refreshToken)
+    {
+        if (refreshToken == null)
+            throw new ArgumentNullException(nameof(refreshToken));
+        _refreshTokens.Add(refreshToken);
+    }
 
 }
 

@@ -50,6 +50,7 @@ namespace jwtWebApi.Services.Token
         {
             if (string.IsNullOrWhiteSpace(ipAddress))
                 throw new ArgumentNullException(nameof(ipAddress), "IP address cannot be null or empty.");
+            if (ipAddress == "::1") ipAddress = "127.0.0.1";
 
             byte[] randomBytes = GenerateRandomBytes();
 

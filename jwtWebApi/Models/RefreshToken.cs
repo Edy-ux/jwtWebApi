@@ -1,6 +1,4 @@
-﻿using jwtWebApi.Models;
-
-namespace jwtWebApi.Models;
+﻿namespace jwtWebApi.Models;
 
 public class RefreshToken
 {
@@ -11,5 +9,5 @@ public class RefreshToken
     public DateTime Created { get; set; }
     public string CreatedByIp { get; set; } = string.Empty;
     public Guid UserId { get; set; }
-    public User User { get; set; } = new();
+    public virtual User User { get; set; } = new();
 }
