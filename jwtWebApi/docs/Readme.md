@@ -20,6 +20,8 @@ API de autenticação JWT com refresh token, modelagem segura e boas práticas e
   - [Fluxo de Autenticação e Refresh Token](#fluxo-de-autenticação-e-refresh-token)
   - [Boas Práticas e Segurança](#boas-práticas-e-segurança)
   - [Como Contribuir](#como-contribuir)
+- [EF CORE](#ef-core)
+    - [🧠 Como o EF Core rastreia alterações em coleções](#-como-o-ef-core-rastreia-alterações-em-coleções)
 
 ---
 
@@ -171,9 +173,83 @@ Content-Type: application/json
 4. Push para a branch (`git push origin feature/nova-feature`)
 5. Abra um Pull Request
 
----
+
+
+# EF CORE
+### 🧠 Como o EF Core rastreia alterações em coleções
+
+
+```csharp
+  var rt = _refreshTokens.FirstOrDefault(t => t.Token == token);
+```
+**O EF Core usa um mecanismo chamado Change Tracker, que faz o seguinte:**
+
+Quando você carrega a entidade do banco (Include(u => u.RefreshTokens)), o EF cria um snapshot interno do estado atual da entidade e da coleção.
+
+Quando você altera a coleção, mesmo que seja por um campo privado como _refreshTokens, se o EF tiver acesso a esse campo (via SetPropertyAccessMode(Field)), ele detecta a diferença entre o snapshot original e o novo estado.
+
+No momento do SaveChanges(), o EF compara:
+
+O que existia antes
+
+
+**qual a melhor abordagem remover o refreshToken ou marcalo com IsExpired = true?**
+
+<p>
+
+A melhor abordagem é marcar o refresh token como inválido <strong>(soft delete)</strong>.Por exemplo, marcando o prop IsExpired ou IsActive para true, em vez de removê-lo fisicamente do banco de dados.</p>
+
+
+**Motivos para marcar como inválido (soft delete):**
+
+- Auditoria e segurança: Você mantém o histórico de uso dos tokens, podendo - identificar tentativas de reutilização ou ataques.
+- Reutilização: Permite bloquear tokens antigos e evitar que sejam usados novamente.
+- Debug e rastreabilidade: Facilita investigações futuras sobre acessos e problemas de autenticação.
+
+
+```csharp
+
+public async Task<(string accessToken, string refreshToken)> AuthenticateAsync(string login, string password, string ipAddress)
+{
+    const int maxRetries = 3;
+    int retryCount = 0;
+
+    while (true)
+    {
+        using var context = _contextFactory.CreateDbContext();
+
+        var user = await context.Users
+            .Include(u => u.RefreshTokens)
+            .FirstOrDefaultAsync(u => u.Login == login);
+
+        if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            throw new UnauthorizedAccessException("User or passoword invalid.");
+
+        var accessToken = _tokenService.GenerateToken(user);
+        var refreshToken = _tokenService.GenerateRefreshToken(ipAddress);
+
+        user.AddRefreshToken(refreshToken);
+
+        try
+        {
+            await context.SaveChangesAsync();
+            return (accessToken, refreshToken.Token);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            retryCount++;
+            if (retryCount >= maxRetries)
+                throw new InvalidOperationException("Conflito de concorrência ao salvar o refresh token. Tente novamente mais tarde.");
+
+            // Aguarda um pequeno tempo antes de tentar novamente (opcional)
+            await Task.Delay(100);
+
+            // Continua o loop para tentar novamente
+        }
+    }
+}
+
+```
 
 **Dúvidas ou sugestões?**  
 Abra uma issue ou entre em contato!
-
----

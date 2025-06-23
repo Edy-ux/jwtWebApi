@@ -1,5 +1,8 @@
 ﻿
 using System.Text;
+using jwtWebApi.Application.Interfaces;
+using jwtWebApi.Services.Token;
+using jwtWebApi.Services.Users;
 
 namespace jwtWebApi.Extentions;
 
@@ -8,6 +11,9 @@ public static class AuthenticationService
 
     public static IServiceCollection AddAuthenticationService(this IServiceCollection services, IConfiguration configuration)
     {
+
+        services.AddScoped<ITokenService, JWTTokenService>();
+        services.AddScoped<IUserService, UserService>();
 
         services.AddAuthentication().AddJwtBearer(options =>
         {

@@ -46,7 +46,7 @@ namespace jwtWebApi.Services.Token
             return jwt;
         }
 
-        public RefreshToken GenerateRefreshToken(string ipAddress)
+        public RefreshToken GenerateRefreshToken(string ipAddress, User user)
         {
             if (string.IsNullOrWhiteSpace(ipAddress))
                 throw new ArgumentNullException(nameof(ipAddress), "IP address cannot be null or empty.");
@@ -54,14 +54,7 @@ namespace jwtWebApi.Services.Token
 
             byte[] randomBytes = GenerateRandomBytes();
 
-            return new RefreshToken
-            {
-                Token = Convert.ToBase64String(randomBytes),
-                Expires = DateTime.UtcNow.AddDays(7),
-                Created = DateTime.UtcNow,
-                CreatedByIp = ipAddress
-
-            };
+            return new RefreshToken(Convert.ToBase64String(randomBytes), DateTime.UtcNow.AddDays(7), ipAddress, userId: user.Id);
         }
         private static byte[] ConvertSecretToBytes(string secret, bool secretIsBase32 = false) =>
               Encoding.UTF8.GetBytes(secret);

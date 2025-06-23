@@ -12,8 +12,8 @@ using jwtWebApi.Context;
 namespace jwtWebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250616213028_UpdatePasswordHashLength")]
-    partial class UpdatePasswordHashLength
+    [Migration("20250622044029_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,6 +41,12 @@ namespace jwtWebApi.Migrations
                     b.Property<DateTime>("Expires")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("Revoked")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -61,10 +67,6 @@ namespace jwtWebApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ConfirmePassword")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -79,8 +81,8 @@ namespace jwtWebApi.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
 
                     b.PrimitiveCollection<string>("Roles")
                         .HasColumnType("nvarchar(max)");

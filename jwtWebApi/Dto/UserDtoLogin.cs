@@ -1,4 +1,5 @@
 
+using jwtWebApi.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace JwtWebApi.Dto
@@ -9,11 +10,8 @@ namespace JwtWebApi.Dto
         public string Login { get; set; }
 
         [Required(ErrorMessage = "Password is required.")]
-        public string Password
-        {
-            get; set;
+        public string Password { get; set; }
 
-        }
     }
 
 }

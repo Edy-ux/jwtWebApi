@@ -5,25 +5,26 @@
 namespace jwtWebApi.Migrations
 {
     /// <inheritdoc />
-    public partial class RemovePasswordConfimation : Migration
+    public partial class DeletedRowVersion : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "ConfirmePassword",
+                name: "RowVersion",
                 table: "Users");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "ConfirmePassword",
+            migrationBuilder.AddColumn<byte[]>(
+                name: "RowVersion",
                 table: "Users",
-                type: "nvarchar(max)",
+                type: "rowversion",
+                rowVersion: true,
                 nullable: false,
-                defaultValue: "");
+                defaultValue: new byte[0]);
         }
     }
 }

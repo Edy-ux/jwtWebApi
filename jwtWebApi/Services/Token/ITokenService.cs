@@ -7,6 +7,6 @@ namespace jwtWebApi.Services.Token
     {
         public string GenerateToken(User user);
 
-        public RefreshToken GenerateRefreshToken(string ipAddress);
+        public RefreshToken GenerateRefreshToken(string ipAddress, User user);
     }
 }

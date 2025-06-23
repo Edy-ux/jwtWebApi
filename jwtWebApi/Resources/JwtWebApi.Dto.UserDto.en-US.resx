@@ -120,7 +120,7 @@
   <data name="ConfirmePassword" xml:space="preserve">
     <value>The password and confirmation do not coincide.</value>
   </data>
-  <data name="Login" xml:space="preserve">
+  <data name="EmailLogin" xml:space="preserve">
     <value>The login must be a valid email.</value>
   </data>
   <data name="PasswordLength" xml:space="preserve">
@@ -143,5 +143,8 @@
   </data>
   <data name="PasswordRequired" xml:space="preserve">
     <value>The password is required</value>
+  </data>
+  <data name="EmailRequired" xml:space="preserve">
+    <value>The Email field is Required.</value>
   </data>
 </root>

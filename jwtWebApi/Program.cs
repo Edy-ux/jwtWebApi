@@ -1,40 +1,11 @@
 using jwtWebApi.Application.Interfaces;
-using jwtWebApi.Configuration;
-using jwtWebApi.Context;
 using jwtWebApi.Extentions;
-using jwtWebApi.Services.Token;
-using jwtWebApi.Services.Users;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers()
-    .AddDataAnnotationsLocalization();
-
-
-
-//Configuration Options 
-builder.Services.Configure<ConfigurationOptions>(
-    builder.Configuration.GetSection(ConfigurationOptions.JWT));
-
-
-//builder.Services.AddSingleton<AppDbContextFactory>();
-
-builder.Services.AddDbContextFactory<AppDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
-//Add Services 
-
-builder.Services.AddScoped<ITokenService, JWTTokenService>();
-builder.Services.AddScoped<IUserService, UserService>();
-
-builder.Services.AddApiInternacionalization();
-builder.Services.AddAuthenticationService(builder.Configuration);
-
-
+builder.Services.AddInfraestructureModule(builder.Configuration);
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 var app = builder.Build();
 
@@ -48,15 +19,27 @@ if (app.Environment.IsDevelopment())
     // app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
+
+
+app.MapGet("/userbytoken/{*tokenId}", async (string tokenId, IUserService service) =>
+{
+
+    var user = await service.GetUserByRefreshTokenAsync(tokenId);
+    if (user is null)
+        return Results.NotFound("User with given token not found");
+
+    return Results.Ok(user);
+
+});
 
 
 app.Run();
 
-
+// This is a placeholder for the Program class. To be used on test projects or when the main entry point is needed.
 public partial class Program { }

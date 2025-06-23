@@ -1,11 +1,12 @@
 ﻿
-using System.Globalization;
 using jwtWebApi.Application.Interfaces;
 using jwtWebApi.Models;
-using jwtWebApi.Services.Token;
 using JwtWebApi.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+
+
+
 namespace JwtWebApi.Controllers;
 
 
@@ -54,14 +55,7 @@ public class AuthController : ControllerBase
         }
         //Check if login already exist
 
-        var user = new User
-        {
-            Login = request.Login,
-            PasswordHash = hashedPassword,
-            Email = request.Login,
-            UserName = request.Username!,
-            Roles = request.Roles ?? ["User"],
-        };
+        var user = new User(request.Login, request.UserName, hashedPassword, request.Email, request.Roles ?? new[] { "User" });
         try
         {
 
@@ -85,6 +79,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UserDtoLogin request)
     {
+
         if (await _userService?.GetUserByLogin(request.Login)! is not User user || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
             _logger.LogWarning(_localizer["InvalidLogin"], request.Login);
@@ -109,20 +104,15 @@ public class AuthController : ControllerBase
 
     }
 
-    [HttpGet("test-localizer")]
-    public IActionResult Test()
-    {
-        var currentCulture = CultureInfo.CurrentUICulture.Name;
-        var message = _localizer["ValidRegistration"];
 
-        return Ok(new
-        {
-            translatedMessage = message.Value,
-            currentCulture,
-        });
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] TokenResponseDto dto)
+    {
+        var result = await _userService.RenewAccessTokenAsync(dto.RefreshToken, HttpContext.Connection.RemoteIpAddress?.ToString()!);
+        if (result == null)
+            return Unauthorized();
+
+        return Ok(result);
     }
 
-
 }
-
-

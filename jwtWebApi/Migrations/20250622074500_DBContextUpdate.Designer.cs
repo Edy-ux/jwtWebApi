@@ -12,8 +12,8 @@ using jwtWebApi.Context;
 namespace jwtWebApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250617002906_RemovePasswordConfimation")]
-    partial class RemovePasswordConfimation
+    [Migration("20250622074500_DBContextUpdate")]
+    partial class DBContextUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,6 +39,12 @@ namespace jwtWebApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Expires")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Revoked")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("RevokedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Token")
@@ -75,8 +81,8 @@ namespace jwtWebApi.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
 
                     b.PrimitiveCollection<string>("Roles")
                         .HasColumnType("nvarchar(max)");
