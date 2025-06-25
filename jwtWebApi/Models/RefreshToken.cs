@@ -17,7 +17,7 @@ public class RefreshToken
 
     [JsonIgnore]
     public User User { get; private set; }  // Navegação para o usuário associado ao token
-    public bool? IsActive => !Revoked && !IsExpired; // 
+    public bool IsActive => !Revoked && !IsExpired;
     public bool Revoked { get; private set; } = false;
     public DateTime? RevokedAt { get; private set; }
     public RefreshToken(string token, DateTime expires, string createdByIp, Guid userId)

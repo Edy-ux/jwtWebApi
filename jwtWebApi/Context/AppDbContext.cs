@@ -16,6 +16,7 @@ namespace jwtWebApi.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             modelBuilder.Entity<User>().HasKey(x => x.Id);
 
             modelBuilder.Entity<User>()

@@ -8,7 +8,7 @@ namespace jwtWebApi.Extentions
     public static class InfraestructureModule
     {
 
-        public static IServiceCollection AddInfraestructureModule(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureModule(this IServiceCollection services, IConfiguration configuration)
         {
             // Add services to the container.
 

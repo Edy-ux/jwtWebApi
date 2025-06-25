@@ -3,9 +3,14 @@
 
 @BASEPATH=https://localhost
 @port=7297
-@token=5dQmguc/1wU80BhdEP8wNSuceJgU2Vk8hU2wsSToNgMYpJ4vY3H3GApXhUuZH2b3zBtNAdX0KV1K5jnGZd4WMA==
+@refresh-token=WOMuFeHeNr1swsCPjeZZfTEN1wc5NQIEC1XgHDBsYMrbihPqfWGtDWSJPtjSHjL474l5Tw1571GoLjbdgd+kRQ==
 
-
-GET {{BASEPATH}}:{{port}}/userbytoken/{{token}}
+GET {{BASEPATH}}:{{port}}/userbytoken/{{refresh-token}}
 Content-Type: application/json
 Header: Accept-Language: en-US
+
+###
+
+POST {{BASEPATH}}:{{port}}/api/v1/auth/refresh
+Content-Type: application/json
+Cookie: refresh-token={{refresh-token}}

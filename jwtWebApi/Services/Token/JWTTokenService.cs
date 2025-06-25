@@ -1,4 +1,5 @@
-﻿using jwtWebApi.Configuration;
+﻿using jwtWebApi.Application.Interfaces;
+using jwtWebApi.Configuration;
 using jwtWebApi.Models;
 using JwtWebApi.Controllers;
 using Microsoft.Extensions.Options;
@@ -37,7 +38,7 @@ namespace jwtWebApi.Services.Token
                 claims: claims,
                 audience: _options.Audience,
                 notBefore: DateTime.Now.AddSeconds(5),
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.Now.AddMinutes(15),
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
 

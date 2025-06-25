@@ -4,7 +4,7 @@ using jwtWebApi.Extentions;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddInfraestructureModule(builder.Configuration);
+builder.Services.AddInfrastructureModule(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 var app = builder.Build();
@@ -25,18 +25,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
-
-app.MapGet("/userbytoken/{*tokenId}", async (string tokenId, IUserService service) =>
-{
-
-    var user = await service.GetUserByRefreshTokenAsync(tokenId);
-    if (user is null)
-        return Results.NotFound("User with given token not found");
-
-    return Results.Ok(user);
-
-});
 
 
 app.Run();

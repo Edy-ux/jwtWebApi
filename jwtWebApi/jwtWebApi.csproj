@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>df115fd3-b0f2-4b13-9ff9-5db54f9d08e8</UserSecretsId>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <NoWarn>$(NoWarn);CS8618;CS8602</NoWarn>
+    <NoWarn>$(NoWarn);CS8618;CS8602;CS8604;</NoWarn>
 
   </PropertyGroup>
   <ItemGroup>

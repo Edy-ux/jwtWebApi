@@ -87,15 +87,21 @@ public class AuthController : ControllerBase
         }
 
 
-        var (token, accessToken) = await _userService.AuthenticateAsync(user.Login, request.Password, HttpContext.Connection.RemoteIpAddress?.ToString()!);
+        var (accessToken, refreshToken) = await _userService.AuthenticateAsync(user.Login, request.Password, HttpContext.Connection.RemoteIpAddress?.ToString()!);
         _logger.LogInformation("Successful login for username: {Username}", request.Login);
 
-        Response.Headers["jwt-token"] = token;
+        Response.Cookies.Append("refresh-token", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = false,
+            SameSite = SameSiteMode.None, // Use Strict or Lax based on your requirements
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+        });
+
         Response.Headers["access-token"] = accessToken;
 
         return Ok(new
         {
-            token,
             accessToken,
             userId = user.Id,
             userName = user.UserName,
@@ -106,13 +112,61 @@ public class AuthController : ControllerBase
 
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh([FromBody] TokenResponseDto dto)
+    public async Task<IActionResult> Refresh()
     {
-        var result = await _userService.RenewAccessTokenAsync(dto.RefreshToken, HttpContext.Connection.RemoteIpAddress?.ToString()!);
-        if (result == null)
-            return Unauthorized();
 
-        return Ok(result);
+        var refreshToken = Request.Cookies["refresh-token"];
+
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            _logger.LogWarning("Refresh token not provided in the request.");
+            return BadRequest(new ProblemDetails { Title = "Bad Request", Detail = "Refresh token is required.", Status = 400 });
+        }
+        var result = await _userService.RenewAccessTokenAsync(refreshToken, HttpContext.Connection.RemoteIpAddress?.ToString()!);
+        if (result == null)
+            return NotFound(new ProblemDetails { Title = "Not Found", Detail = "Refresh token not found or expired." });
+
+        // (Opcional) Atualiza o cookie com o novo refresh token
+        Response.Cookies.Append("refresh-token", result.RefreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+        });
+
+        Response.Headers["jwt-token"] = result.AccessToken;
+
+        return Ok(new { accessToken = result.AccessToken });
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+
+        var refreshToken = Request.Cookies["refresh-token"];
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            _logger.LogWarning("Refresh token not provided in the request.");
+            return BadRequest(new ProblemDetails { Title = "Bad Request", Detail = "Refresh token is required.", Status = 400 });
+        }
+
+        try
+        {
+            var user = await _userService.GetUserByRefreshTokenAsync(refreshToken);
+
+            await _userService.LogoutAsync(refreshToken);
+            //delete the cookie
+            Response.Cookies.Delete("refresh-token");
+
+            _logger.LogInformation("User {UserName} logged out successfully.", user?.UserName);
+            return Ok(new { Title = "Logout successful", Detail = "User logged out successfully." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message, "Error occurred while logging out.");
+            return StatusCode(500, new ProblemDetails { Title = "Internal Server Error", Detail = "An error occurred while processing your request." });
+        }
     }
 
 }

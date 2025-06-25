@@ -1,7 +1,7 @@
 ﻿
 using jwtWebApi.Models;
 
-namespace jwtWebApi.Services.Token
+namespace jwtWebApi.Application.Interfaces
 {
     public interface ITokenService
     {
