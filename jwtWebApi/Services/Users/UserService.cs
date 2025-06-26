@@ -1,4 +1,5 @@
 
+using System.Linq.Expressions;
 using AutoMapper;
 using jwtWebApi.Application.Interfaces;
 using jwtWebApi.Context;
@@ -6,14 +7,14 @@ using jwtWebApi.Dto;
 using jwtWebApi.Dto.User;
 using jwtWebApi.Exceptions;
 using jwtWebApi.Models;
-
+using JwtWebApi.Dto;
 using Microsoft.EntityFrameworkCore;
 
 
 namespace jwtWebApi.Services.Users;
 
-public class UserService
-    (IDbContextFactory<AppDbContext> context, ITokenService tokenService, IMapper mapper) : IUserService
+
+public class UserService(IDbContextFactory<AppDbContext> context, ITokenService tokenService, IMapper mapper) : IUserService
 {
 
     private readonly IDbContextFactory<AppDbContext> _contextFactory = context;
@@ -27,16 +28,19 @@ public class UserService
         var entity = await context.Users.FindAsync(id);
         return _mapper.Map<UserDtoResponse>(entity);
     }
-    public async Task<User?> GetUserByLogin(string login)
+    public async Task<UserDtoResponse?> GetUserByLogin(UserDtoLogin? user)
     {
-        if (string.IsNullOrEmpty(login))
-        {
-            throw new ArgumentException("Login cannot be null or empty.", nameof(login));
-        }
-        using var context = _contextFactory.CreateDbContext();
-        return await context.Users
-            .FirstOrDefaultAsync(u => u.Login == login);
 
+        using var context = _contextFactory.CreateDbContext();
+        var entity = await context.Users
+            .FirstOrDefaultAsync(u => u.Login == user.Login || u.UserName == user.UserName);
+
+        if (entity == null)
+            return null;
+        if (!BCrypt.Net.BCrypt.Verify(user.Password, entity.PasswordHash))
+            throw new UnauthorizedAccessException("Login or password Invalid");
+
+        return _mapper.Map<UserDtoResponse>(entity);
     }
     public async Task<UserDtoResponse?> GetUserByRefreshTokenAsync(string refreshToken)
     {
@@ -45,6 +49,7 @@ public class UserService
         var user = await context.Users
             .Include(user => user.RefreshTokens.Where(rf => rf.Token.Equals(refreshToken) && !rf.Revoked))
             .FirstOrDefaultAsync(user => user.RefreshTokens.Any(rf => rf.Token.Equals(refreshToken) && !rf.Revoked));
+
 
         return _mapper.Map<UserDtoResponse>(user);
 
@@ -58,13 +63,11 @@ public class UserService
             .Include(u => u.RefreshTokens)
             .FirstOrDefaultAsync(u => u.Login == login);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
-            throw new UnauthorizedAccessException("User or password invalid.");
-
+        if (user == null)
+            throw new UnauthorizedAccessException("Invalid login.");
 
         var accessToken = _tokenService.GenerateToken(user);
         var refreshToken = _tokenService.GenerateRefreshToken(ipAddress, user);
-
 
         user.AddRefreshToken(refreshToken);
 
@@ -79,7 +82,7 @@ public class UserService
 
         var tokenEntity = await context.RefreshTokens
             .Include(rt => rt.User)
-            .FirstOrDefaultAsync(rt => rt.Token == refreshToken && !rt.Revoked);
+            .FirstOrDefaultAsync(IsActiveRefreshToken(refreshToken));
 
         if (tokenEntity == null || tokenEntity.Expires < DateTime.UtcNow)
             return null;
@@ -110,7 +113,7 @@ public class UserService
         using var context = _contextFactory.CreateDbContext();
 
         var token = await context.RefreshTokens
-             .FirstOrDefaultAsync(token => token.Token.Equals(refreshToken) && token.IsActive);
+             .FirstOrDefaultAsync(IsActiveRefreshToken(refreshToken));
 
         if (token == null)
             throw new UnauthorizedAccessException("Invalid refresh token.");
@@ -119,21 +122,29 @@ public class UserService
         await context.SaveChangesAsync();
 
     }
-    public async Task<User?> InsertUserAsync(User user)
+    public async Task<UserDtoResponse?> InsertUserAsync(UserDto userDto)
     {
         using var context = _contextFactory.CreateDbContext();
 
         var existingUser = await context.Users
-            .FirstOrDefaultAsync(u => u.Login == user.Login || u.UserName == user.UserName);
+            .FirstOrDefaultAsync(u => u.Login == userDto.Login || u.UserName == userDto.UserName);
 
         if (existingUser is not null)
         {
-            throw new UserAlreadyExistsException($"User with login '{user.Login} or {user.UserName}' already exists.");
+            throw new UserAlreadyExistsException($"User with login {userDto.Login} or {userDto.UserName}  already exists.");
         }
+        var entity = new User(
+            login: userDto.Login,
+            email: userDto.Email,
+            roles: userDto.Roles,
+            username: userDto.UserName,
+            hash: BCrypt.Net.BCrypt.HashPassword(userDto.Password)
+            );
+        await context.Users.AddAsync(entity);
 
-        await context.Users.AddAsync(user);
         await context.SaveChangesAsync();
-        return user;
+
+        return _mapper.Map<UserDtoResponse>(entity);
     }
     public async Task UpdateUserAsync(User user)
     {
@@ -151,4 +162,7 @@ public class UserService
             await context.SaveChangesAsync();
         }
     }
+    private static Expression<Func<RefreshToken, bool>> IsActiveRefreshToken(string token) =>
+           rt => rt.Token.Equals(token) && !rt.Revoked && rt.Expires > DateTime.UtcNow;
+
 }

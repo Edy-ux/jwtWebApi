@@ -3,5 +3,5 @@
         "**/bin": false,
         "**/obj": true
     },
-    "cSpell.words": ["annotamions"]
+    "cSpell.words": ["annotamions", "appsettings"]
 }

@@ -7,6 +7,8 @@ namespace JwtWebApi.Dto;
 public class UserDto
 {
 
+    public Guid? Id { get; set; }
+
     [Required(ErrorMessage = "LoginRequired")]
     [EmailAddress(ErrorMessage = "EmailLogin")]
     public string Login { get; set; } = string.Empty;
@@ -23,12 +25,20 @@ public class UserDto
     [Compare("Password", ErrorMessage = "PasswordMismatch")]
     public string ConfirmePassword { get; set; } = string.Empty;
     public string[]? Roles { get; set; } = [];
-
-    public List<RefreshToken>? RefreshTokens { get; set; }
+    public bool EmailConfirmed { get; private set; }
 
     [EmailAddress(ErrorMessage = "EmailLogin")]
-    public string? Email { get; set; } = string.Empty;
+    public string Email { get; set; }
+
+    public UserDto() { }
+    public UserDto(string login, string email, string[] roles, string userName)
+    {
+        Login = login;
+        Email = email;
+        Roles = roles;
+        UserName = userName;
+
+    }
 
 
 }
-

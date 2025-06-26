@@ -1,14 +1,12 @@
 
 using System.Text.Json.Serialization;
 using jwtWebApi.Dto.User;
-using jwtWebApi.Models;
-using JwtWebApi.Dto;
 
 namespace jwtWebApi.Dto;
 
 public class RefreshTokenDto
 {
-    public Guid Id { get; private set; }
+    public Guid Id { get; set; }
     public string Token { get; set; }
     public DateTime Expires { get; set; }
     public bool IsExpired => DateTime.UtcNow >= Expires;

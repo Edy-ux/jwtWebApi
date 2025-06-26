@@ -19,9 +19,10 @@ API de autenticação JWT com refresh token, modelagem segura e boas práticas e
     - [4. Renovar JWT usando refresh token](#4-renovar-jwt-usando-refresh-token)
   - [Fluxo de Autenticação e Refresh Token](#fluxo-de-autenticação-e-refresh-token)
   - [Boas Práticas e Segurança](#boas-práticas-e-segurança)
-  - [Como Contribuir](#como-contribuir)
 - [EF CORE](#ef-core)
     - [🧠 Como o EF Core rastreia alterações em coleções](#-como-o-ef-core-rastreia-alterações-em-coleções)
+    - [Finalizar processo dotnet](#finalizar-processo-dotnet)
+  - [Como Contribuir](#como-contribuir)
 
 ---
 
@@ -164,17 +165,6 @@ Content-Type: application/json
 - Validação de entrada e tratamento de erros implementados.
 
 ---
-
-## Como Contribuir
-
-1. Faça um fork do projeto
-2. Crie uma branch (`git checkout -b feature/nova-feature`)
-3. Commit suas alterações (`git commit -am 'Adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
-
-
-
 # EF CORE
 ### 🧠 Como o EF Core rastreia alterações em coleções
 
@@ -251,5 +241,29 @@ public async Task<(string accessToken, string refreshToken)> AuthenticateAsync(s
 
 ```
 
+### Finalizar processo dotnet
+No CMD
+```sh
+taskkill /IM dotnet.exe /F
+taskkill /PID <PID> /F
+```
+No PowerShell
+
+```sh
+Get-Process | Where-Object { $_.ProcessName -like "*dotnet*" }
+Stop-Process -Name dotnet
+Stop-Process -Id <PID>  
+```
+
+## Como Contribuir
+
+1. Faça um fork do projeto
+2. Crie uma branch (`git checkout -b feature/nova-feature`)
+3. Commit suas alterações (`git commit -am 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+
 **Dúvidas ou sugestões?**  
 Abra uma issue ou entre em contato!
+

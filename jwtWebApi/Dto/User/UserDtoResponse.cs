@@ -1,6 +1,7 @@
 
 
 using System.Text.Json.Serialization;
+using jwtWebApi.Models;
 
 namespace jwtWebApi.Dto.User
 {

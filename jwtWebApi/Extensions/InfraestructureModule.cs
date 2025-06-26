@@ -3,9 +3,9 @@ using jwtWebApi.Configuration;
 using jwtWebApi.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace jwtWebApi.Extentions
+namespace jwtWebApi.Extensions
 {
-    public static class InfraestructureModule
+    public static class InfrastructureModule
     {
 
         public static IServiceCollection AddInfrastructureModule(this IServiceCollection services, IConfiguration configuration)
@@ -13,7 +13,7 @@ namespace jwtWebApi.Extentions
             // Add services to the container.
 
 
-            services.AddApiInternacionalization()
+            services.AddApiInternationalization()
                     .AddAuthenticationService(configuration)
                     .Configure<ConfigurationOptions>(configuration.GetSection(ConfigurationOptions.JWT))
                     .AddDbContextFactory<AppDbContext>(options =>

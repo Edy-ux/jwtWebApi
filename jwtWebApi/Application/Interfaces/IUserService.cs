@@ -3,6 +3,7 @@
 using jwtWebApi.Dto;
 using jwtWebApi.Dto.User;
 using jwtWebApi.Models;
+using JwtWebApi.Dto;
 
 namespace jwtWebApi.Application.Interfaces
 {
@@ -10,9 +11,9 @@ namespace jwtWebApi.Application.Interfaces
     {
 
         Task<UserDtoResponse?> GetUserByIdAsync(int id);
-        Task<User?> GetUserByLogin(string login);
+        Task<UserDtoResponse?> GetUserByLogin(UserDtoLogin user);
         Task UpdateUserAsync(User user);
-        Task<User?> InsertUserAsync(User user);
+        Task<UserDtoResponse?> InsertUserAsync(UserDto user);
         Task DeleteUserAsync(Guid id);
         Task<UserDtoResponse?> GetUserByRefreshTokenAsync(string refreshToken);
         Task<(string accessToken, string refreshToken)> AuthenticateAsync(string login, string password, string ipAddress);

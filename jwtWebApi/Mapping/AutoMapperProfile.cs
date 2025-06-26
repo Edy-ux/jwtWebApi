@@ -9,8 +9,10 @@ public class AutoMapperProfile : Profile
     public AutoMapperProfile()
     {
         CreateMap<User, UserDto>();
+        CreateMap<UserDto, User>()
+            .ForMember(dest => dest.RefreshTokens, opt => opt.Ignore());
         CreateMap<User, UserDtoResponse>();
-        // .ForMember(dest => dest.RefreshTokens, opt => opt.MapFrom(src => src.RefreshTokens.Where(rf => !rf.Revoked).ToList()));
+        //    .ForMember(dest => dest.RefreshTokens, opt => opt.Ignore());
         CreateMap<RefreshToken, RefreshTokenDto>();
     }
 }

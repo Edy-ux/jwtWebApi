@@ -4,7 +4,7 @@ using jwtWebApi.Application.Interfaces;
 using jwtWebApi.Services.Token;
 using jwtWebApi.Services.Users;
 
-namespace jwtWebApi.Extentions;
+namespace jwtWebApi.Extensions;
 
 public static class AuthenticationService
 {

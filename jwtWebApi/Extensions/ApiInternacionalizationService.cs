@@ -1,15 +1,15 @@
-﻿namespace jwtWebApi.Extentions;
+﻿namespace jwtWebApi.Extensions;
 
-public static class ApiInternacionalizationService
+public static class ApiInternationalizationService
 {
-    public static IServiceCollection AddApiInternacionalization(this IServiceCollection services)
+    public static IServiceCollection AddApiInternationalization(this IServiceCollection services)
     {
         services.AddLocalization(options => options.ResourcesPath = "Resources");
 
         return services;
     }
 
-    public static WebApplication UseApiInternacionalization(this WebApplication app)
+    public static WebApplication UseApiInternationalization(this WebApplication app)
     {
         var supportedCultures = new string[] { "pt-BR", "en-US" };
         var localizationOptions = new RequestLocalizationOptions()

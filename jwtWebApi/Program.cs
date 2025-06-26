@@ -1,5 +1,5 @@
 using jwtWebApi.Application.Interfaces;
-using jwtWebApi.Extentions;
+using jwtWebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +10,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 var app = builder.Build();
 
 //Add Localization and Internationalization
-app.UseApiInternacionalization();
+app.UseApiInternationalization();
 
 // Configure the HTTP request pipeline.i
 if (app.Environment.IsDevelopment())
